@@ -14,24 +14,24 @@
 
 struct  Vextex
 {
-    float x, y;
-    float ex, ey;
-    float wd;
+    float x, y;  //坐标
+    float ex, ey; //ex=round？0:1，ey=up?1:-1
+    float wx, wy; //挤压向量
 };
 
 static const struct Vextex vertices[] =
 {
-    { -1.2f,  0.4f, 1.f,  1.f, 0.6f },
-    { -1.2f, -0.4f, 1.f, -1.f, 0.6f },
+    { -0.8f,  0.0f, 1.f,  1.f, -1.0f,  1.0f},
+    { -0.8f,  0.0f, 1.f, -1.f, -1.0f, -1.0f},
     
-    { -0.8f,  0.4f, 0.f,  1.f, 0.6f },
-    { -0.8f, -0.4f, 0.f, -1.f, 0.6f },
+    { -0.8f,  0.0f, 0.f,  1.f,  0.0f,  1.0f},
+    { -0.8f,  0.0f, 0.f, -1.f,  0.0f, -1.0f},
     
-    {  0.9f,  0.4f, 0.f,  1.f, 0.6f },
-    {  0.9f, -0.4f, 0.f, -1.f, 0.6f },
+    {  0.9f,  0.0f, 0.f,  1.f,  0.0f,  1.0f},
+    {  0.9f,  0.0f, 0.f, -1.f,  0.0f, -1.0f},
     
-    {  1.3f,  0.4f, 1.f,  1.f, 0.6f },
-    {  1.3f, -0.4f, 1.f, -1.f, 0.6f }
+    {  0.9f,  0.0f, 1.f,  1.f,  1.0f,  1.0f},
+    {  0.9f,  0.0f, 1.f, -1.f,  1.0f, -1.0f}
     
 };
  
@@ -48,33 +48,35 @@ static const unsigned int indices[] = {
 static const char* vertex_shader_text =
 "#version 110                                  \n"
 "uniform mat4 MVP;                             \n"
-"attribute vec3 vCol;                          \n"
+"uniform vec2 uWidths;                         \n"
+"                                              \n"
+"attribute vec4 vCol;                          \n"
 "attribute vec2 vPos;                          \n"
 "                                              \n"
 "varying vec2 normal;                          \n"
-"varying float width;                          \n"
+"varying vec2 widths;                          \n"
 "void main()                                   \n"
 "{                                             \n"
-"    gl_Position = MVP * vec4(vPos, 0.0, 1.0); \n"
+"    widths  = uWidths;                        \n"
 "    normal = vCol.xy;                         \n"
-"    width  = vCol.z;                          \n"
+"                                              \n"
+"    vec2 epos = vPos + vCol.zw * widths.s;    \n"
+"    gl_Position = MVP * vec4(epos, 0.0, 1.0); \n"
 "}                                             \n";
 
 static const char* fragment_shader_text =
 "#version 110                                   \n"
 "varying vec2 normal;                           \n"
-"varying float width;                           \n"
+"varying vec2 widths;                           \n"
 "void main()                                    \n"
 "{                                              \n"
-"    float blur = 0.1;                         \n"
-"    float dist = length(normal) * width;       \n"
-"    float blur2 = (width - dist) / blur;       \n"
-"    float alpha = clamp(blur2, 0.0, 1.0);      \n"
-//"    if(alpha<1.0)                            \n"
-//"    gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0); \n"
-//"    else                                     \n"
-"    gl_FragColor = vec4(0.0, 0.8, 1.0, alpha); \n"
-"}                                              \n";
+"    float blur = 0.01;                         \n"
+"    float dist = length(normal) * widths.s;    \n"
+"    float blur2 = (widths.s - dist) / blur;           \n"
+"    float blur1 = (dist - (widths.t - blur))/ blur;   \n"
+"    float alpha = clamp(min(blur1,blur2), 0.0, 1.0);  \n"
+"    gl_FragColor = vec4(0.0, 0.8, 1.0, alpha);        \n"
+"}                                                     \n";
 
 static void error_callback(int error, const char* description)
 {
@@ -91,7 +93,7 @@ int main(void)
 {
     GLFWwindow* window;
     GLuint vertex_buffer, vertex_shader, fragment_shader, program;
-    GLint mvp_location, vpos_location, vcol_location;
+    GLint mvp_location, widths_location, vpos_location, vcol_location;
 
     glfwSetErrorCallback(error_callback);
 
@@ -136,6 +138,7 @@ int main(void)
     glLinkProgram(program);
 
     mvp_location = glGetUniformLocation(program, "MVP");
+    widths_location = glGetUniformLocation(program, "uWidths");
     vpos_location = glGetAttribLocation(program, "vPos");
     vcol_location = glGetAttribLocation(program, "vCol");
 
@@ -143,7 +146,7 @@ int main(void)
     glVertexAttribPointer(vpos_location, 2, GL_FLOAT, GL_FALSE,
                           sizeof(vertices[0]), (void*) 0);
     glEnableVertexAttribArray(vcol_location);
-    glVertexAttribPointer(vcol_location, 3, GL_FLOAT, GL_FALSE,
+    glVertexAttribPointer(vcol_location, 4, GL_FLOAT, GL_FALSE,
                           sizeof(vertices[0]), (void*) (sizeof(float) * 2));
 
     while (!glfwWindowShouldClose(window))
@@ -151,6 +154,7 @@ int main(void)
         float ratio;
         int width, height;
         mat4x4 m, p, mvp;
+        vec2 widths={0.2, 0.08};
 
         glfwGetFramebufferSize(window, &width, &height);
         ratio = width / (float) height;
@@ -165,6 +169,7 @@ int main(void)
 
         glUseProgram(program);
         glUniformMatrix4fv(mvp_location, 1, GL_FALSE, (const GLfloat*) mvp);
+        glUniform2fv(widths_location, 1, widths);
         glDrawElements(GL_TRIANGLES,  18, GL_UNSIGNED_INT, indices);
 
         glfwSwapBuffers(window);
