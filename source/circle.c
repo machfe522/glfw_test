@@ -21,28 +21,18 @@ struct  Vextex
 
 static const struct Vextex vertices[] =
 {
-    { -1.2f,  0.4f, 1.f,  1.f, 0.6f },
-    { -1.2f, -0.4f, 1.f, -1.f, 0.6f },
+    { -0.6f,  0.4f, 1.f,  1.f, 0.6f },
+    { -0.6f, -0.4f, 1.f, -1.f, 0.6f },
     
-    { -0.8f,  0.4f, 0.f,  1.f, 0.6f },
-    { -0.8f, -0.4f, 0.f, -1.f, 0.6f },
+    { 0.2f,  0.4f, -1.f,  1.f, 0.6f },
+    { 0.2f, -0.4f, -1.f, -1.f, 0.6f },
     
-    {  0.9f,  0.4f, 0.f,  1.f, 0.6f },
-    {  0.9f, -0.4f, 0.f, -1.f, 0.6f },
-    
-    {  1.3f,  0.4f, 1.f,  1.f, 0.6f },
-    {  1.3f, -0.4f, 1.f, -1.f, 0.6f }
     
 };
  
 static const unsigned int indices[] = {
     0,1,2,
     1, 3,2,
-    2,3,4,
-    3, 5,4,
-    4,5,6,
-    5, 7,6,
-    
 };
 
 static const char* vertex_shader_text =
@@ -66,14 +56,14 @@ static const char* fragment_shader_text =
 "varying float width;                           \n"
 "void main()                                    \n"
 "{                                              \n"
-"    float blur = 0.1;                         \n"
+"    float blur = 0.01;                         \n"
 "    float dist = length(normal) * width;       \n"
 "    float blur2 = (width - dist) / blur;       \n"
 "    float alpha = clamp(blur2, 0.0, 1.0);      \n"
 //"    if(alpha<1.0)                            \n"
 //"    gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0); \n"
 //"    else                                     \n"
-"    gl_FragColor = vec4(0.0, 0.8, 1.0, alpha); \n"
+"    gl_FragColor = vec4(1.0, 0.8, 0.3, alpha); \n"
 "}                                              \n";
 
 static void error_callback(int error, const char* description)
@@ -165,7 +155,7 @@ int main(void)
 
         glUseProgram(program);
         glUniformMatrix4fv(mvp_location, 1, GL_FALSE, (const GLfloat*) mvp);
-        glDrawElements(GL_TRIANGLES,  18, GL_UNSIGNED_INT, indices);
+        glDrawElements(GL_TRIANGLES,  6, GL_UNSIGNED_INT, indices);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
