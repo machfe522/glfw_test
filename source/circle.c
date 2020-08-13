@@ -77,6 +77,46 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
         glfwSetWindowShouldClose(window, GLFW_TRUE);
 }
 
+static void printShaderLog(GLuint shader)
+{
+    GLint shaderState;
+    glGetShaderiv(shader, GL_COMPILE_STATUS, &shaderState);
+    if(shaderState == GL_TRUE)
+    {
+        return;
+    }
+    GLsizei bufferSize = 0;
+    glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &bufferSize);
+    if(bufferSize > 0)
+    {
+        char* buffer = (char*)malloc(bufferSize);
+        glGetShaderInfoLog(shader, bufferSize, NULL, buffer);
+        printf("%s", buffer);
+        free(buffer);
+    }
+}
+
+static void printLinkerLog(GLuint program)
+{
+    GLint linkState;
+    glGetProgramiv(program, GL_LINK_STATUS, &linkState);
+    if(linkState == GL_TRUE)
+    {
+        return;
+    }
+    
+    GLsizei bufferSize = 0;
+    glGetProgramiv(program, GL_INFO_LOG_LENGTH, &bufferSize);
+    if(bufferSize > 0)
+    {
+        char* buffer = (char*)malloc(bufferSize);
+        glGetProgramInfoLog(program, bufferSize, NULL, buffer);
+        printf("%s", buffer);
+        free(buffer);
+    }
+}
+
+ 
 int main(void)
 {
     GLFWwindow* window;
@@ -115,15 +155,18 @@ int main(void)
     vertex_shader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertex_shader, 1, &vertex_shader_text, NULL);
     glCompileShader(vertex_shader);
+    printShaderLog(vertex_shader);
 
     fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fragment_shader, 1, &fragment_shader_text, NULL);
     glCompileShader(fragment_shader);
-
+    printShaderLog(fragment_shader);
+    
     program = glCreateProgram();
     glAttachShader(program, vertex_shader);
     glAttachShader(program, fragment_shader);
     glLinkProgram(program);
+    printLinkerLog(program);
 
     mvp_location = glGetUniformLocation(program, "MVP");
     vpos_location = glGetAttribLocation(program, "vPos");
