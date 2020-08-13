@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		DF2C9EFB24E57EE000F66712 /* hexagon.cpp in Sources */ = {isa = PBXBuildFile; fileRef = DF2C9EFA24E57EE000F66712 /* hexagon.cpp */; };
 		DF526B8924A4A90A00C5F2B3 /* libglfw.a in Frameworks */ = {isa = PBXBuildFile; fileRef = DF526B8824A4A90A00C5F2B3 /* libglfw.a */; };
-		DFC95F6B24A5FFCF009C7CCB /* circle.c in Sources */ = {isa = PBXBuildFile; fileRef = DFC95F6A24A5FFCF009C7CCB /* circle.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -24,10 +24,11 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		DF2C9EFA24E57EE000F66712 /* hexagon.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = hexagon.cpp; sourceTree = "<group>"; };
+		DF2C9EFC24E580B100F66712 /* stb_image.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stb_image.h; sourceTree = "<group>"; };
 		DF526AE424A49B7A00C5F2B3 /* simple */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = simple; sourceTree = BUILT_PRODUCTS_DIR; };
 		DF526AEF24A4A0EB00C5F2B3 /* linmath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = linmath.h; sourceTree = "<group>"; };
 		DF526B8824A4A90A00C5F2B3 /* libglfw.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libglfw.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		DFC95F6A24A5FFCF009C7CCB /* circle.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = circle.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -62,7 +63,8 @@
 		DF526AE624A49B7A00C5F2B3 /* source */ = {
 			isa = PBXGroup;
 			children = (
-				DFC95F6A24A5FFCF009C7CCB /* circle.c */,
+				DF2C9EFC24E580B100F66712 /* stb_image.h */,
+				DF2C9EFA24E57EE000F66712 /* hexagon.cpp */,
 				DF526AEF24A4A0EB00C5F2B3 /* linmath.h */,
 			);
 			path = source;
@@ -133,7 +135,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DFC95F6B24A5FFCF009C7CCB /* circle.c in Sources */,
+				DF2C9EFB24E57EE000F66712 /* hexagon.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -254,6 +256,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				HEADER_SEARCH_PATHS = ./include;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -263,6 +266,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				HEADER_SEARCH_PATHS = ./include;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
