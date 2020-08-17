@@ -24,18 +24,21 @@ struct  Vextex
 
 static const struct Vextex vertices[] =
 {
-    { -0.6f,  0.4f, 1.f,  1.f, 0.6f },
-    { -0.6f, -0.4f, 1.f, -1.f, 0.6f },
+    { -0.6f,  0.4f, 0.f,  1.f, 0.6f },
+    { -0.6f, -0.4f, 0.f,  0.f, 0.6f },
     
-    { 0.2f,  0.4f, -1.f,  1.f, 0.6f },
-    { 0.2f, -0.4f, -1.f, -1.f, 0.6f },
+    { 0.2f,  0.4f,  0.666f,  1.f, 0.6f },
+    { 0.2f, -0.4f,  0.666f,  0.f, 0.6f },
     
-    
+    { 0.6f,  0.4f,  1.f,  1.f, 0.6f },
+    { 0.6f, -0.4f,  1.f,  0.f, 0.6f },
 };
  
 static const unsigned int indices[] = {
     0,1,2,
     1, 3,2,
+    2,3,4,
+    3, 5,4,
 };
 
 static const char* vertex_shader_text =
@@ -54,20 +57,20 @@ static const char* vertex_shader_text =
 "}                                             \n";
 
 static const char* fragment_shader_text =
-"#version 110                                   \n"
-"varying vec2 normal;                           \n"
-"varying float width;                           \n"
-"void main()                                    \n"
-"{                                              \n"
-"    float blur = 0.01;                         \n"
-"    float dist = length(normal) * width;       \n"
-"    float blur2 = (width - dist) / blur;       \n"
-"    float alpha = clamp(blur2, 0.0, 1.0);      \n"
-//"    if(alpha<1.0)                            \n"
-//"    gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0); \n"
-//"    else                                     \n"
-"    gl_FragColor = vec4(1.0, 0.8, 0.3, alpha); \n"
-"}                                              \n";
+"#version 110                                             \n"
+"varying vec2 normal;                                     \n"
+"varying float width;                                     \n"
+"                                                         \n"
+" uniform sampler2D u_image;                              \n"
+"void main()                                              \n"
+"{                                                        \n"
+"                                                         \n"
+"                                                         \n"
+"                                                         \n"
+"                                                         \n"
+"    gl_FragColor =  texture2D(u_image, normal);          \n"
+"    //gl_FragColor = vec4(1.0, 0.8, 0.3, 1.0);             \n"
+"}                                                        \n";
 
 static void error_callback(int error, const char* description)
 {
@@ -160,7 +163,7 @@ int main(void)
 {
     GLFWwindow* window;
     GLuint vertex_buffer, vertex_shader, fragment_shader, program;
-    GLint mvp_location, vpos_location, vcol_location;
+    GLint mvp_location, tex_location, vpos_location, vcol_location;
 
     glfwSetErrorCallback(error_callback);
 
@@ -208,6 +211,7 @@ int main(void)
     printLinkerLog(program);
 
     mvp_location = glGetUniformLocation(program, "MVP");
+    tex_location = glGetUniformLocation(program, "u_image");
     vpos_location = glGetAttribLocation(program, "vPos");
     vcol_location = glGetAttribLocation(program, "vCol");
 
@@ -218,6 +222,9 @@ int main(void)
     glVertexAttribPointer(vcol_location, 3, GL_FLOAT, GL_FALSE,
                           sizeof(vertices[0]), (void*) (sizeof(float) * 2));
 
+    unsigned int  textureId =  createTexture("/Users/machfe/Documents/08_mapbox/glfw_3.3.2/source/data/724568.png");
+    unsigned int  arrowId =  createTexture("/Users/machfe/Documents/08_mapbox/glfw_3.3.2/source/data/arrow.png");
+    
     while (!glfwWindowShouldClose(window))
     {
         float ratio;
@@ -236,8 +243,17 @@ int main(void)
         mat4x4_mul(mvp, p, m);
 
         glUseProgram(program);
+       
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, textureId);
+        
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, arrowId);
+            
         glUniformMatrix4fv(mvp_location, 1, GL_FALSE, (const GLfloat*) mvp);
-        glDrawElements(GL_TRIANGLES,  6, GL_UNSIGNED_INT, indices);
+        glUniform1i(tex_location, 1); 
+        
+        glDrawElements(GL_TRIANGLES,  sizeof(indices)/sizeof(indices[0]), GL_UNSIGNED_INT, indices);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
